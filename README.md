@@ -14,7 +14,7 @@
 # Project Timeline for SokoBot
 
 ## Week 1 (Sept 21–27) → Setup & Research
-- [ ] Install and configure Java JDK, ensure starter program compiles and runs (`freeplay` & `sokobot` modes).
+- [ ] Install and configure Java JDK, clone the repo and ensure starter program compiles and runs (`freeplay` & `sokobot` modes).
 - [ ] Play a few Sokoban levels to fully understand rules and mechanics.
 - [ ] Research algorithms relevant to Sokoban:
   - BFS, DFS, Uniform Cost Search
