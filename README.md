@@ -11,8 +11,7 @@
 
 ---
 
-## Project Timeline
-# 📅 Project Timeline for SokoBot
+# Project Timeline for SokoBot
 
 ## Week 1 (Sept 21–27) → Setup & Research
 - [ ] Install and configure Java JDK, ensure starter program compiles and runs (`freeplay` & `sokobot` modes).
@@ -23,23 +22,17 @@
   - Deadlock detection strategies (to avoid impossible states)
 - [ ] Assign roles within the group (algorithm research, coding, testing, documentation).
 
----
-
 ## Week 2 (Sept 28–Oct 4) → Initial Implementation
 - [ ] Represent states clearly (`mapData`, `itemsData`).
 - [ ] Implement a simple solver (e.g., BFS or DFS) to confirm state representation works.
 - [ ] Start documenting how the state and actions are represented for the report.
 - [ ] Test on the simplest Sokoban levels.
 
----
-
 ## Week 3 (Oct 5–11) → Algorithm Refinement
 - [ ] Add heuristics (A* or IDA*) to improve solving efficiency.
 - [ ] Experiment with pruning strategies (deadlock checks, redundant move elimination).
 - [ ] Ensure solutions finish within **15-second time limit**.
 - [ ] Keep logs of performance for different algorithms (feeds into “Evaluation and Performance” section of the report).
-
----
 
 ## Week 4 (Oct 12–18) → Evaluation & Report Draft
 - [ ] Test solver on multiple levels (both provided & downloaded).
@@ -52,8 +45,6 @@
   - Strengths & weaknesses (based on test results)
   - Challenges encountered
   - Contribution table
-
----
 
 ## Week 5 (Oct 19–23) → Finalization
 - [ ] Polish the code: remove unused methods, ensure clarity and comments.
