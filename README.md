@@ -8,7 +8,7 @@
 
 ## Status and Updates
 - 09/20/2025 Feat: Initialized Contributors and README
-
+- 09/24/2025 Feat: Testing Playing Sokoban
 ---
 
 ## Project Description
