@@ -9,6 +9,16 @@
 ## Status and Updates
 - 09/20/2025 Feat: Initialized Contributors and README
 - 09/24/2025 Feat: Testing Playing Sokoban
+- 09/26/2025 Feat: Tested Game Features and Timing, A* Search Implementation Trial, Brute Force Solution Trial
+---
+
+## Algorithms to be deployed
+- A* Search (EJ)
+- Breadth First Search (REECE)
+- Best First Search (EJ)
+- Bidirectional Search (REECE)
+- Depth First Search (PHOEBE)
+- Uniform Cost Search (PHOEBE)
 ---
 
 # Project Timeline for SokoBot
