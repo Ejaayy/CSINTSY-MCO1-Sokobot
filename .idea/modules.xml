@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/BFS-Solution.md/BFS-Solution.md.iml" filepath="$PROJECT_DIR$/BFS-Solution.md/BFS-Solution.md.iml" />
       <module fileurl="file://$PROJECT_DIR$/CSINTSY-MCO1-Sokobot.iml" filepath="$PROJECT_DIR$/CSINTSY-MCO1-Sokobot.iml" />
     </modules>
   </component>

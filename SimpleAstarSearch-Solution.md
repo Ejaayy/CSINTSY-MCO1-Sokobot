@@ -15,11 +15,11 @@ Key differences from BFS:
 
 public class SokoBot {
 
-  public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
+public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
 // ---- Step 1: Collect target positions, player, and crates ----
-    Set<Point> targets = new HashSet<>();
-    int startX = -1, startY = -1;
-    Set<Point> crates = new HashSet<>();
+Set<Point> targets = new HashSet<>();
+int startX = -1, startY = -1;
+Set<Point> crates = new HashSet<>();
 
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
@@ -137,5 +137,5 @@ public class SokoBot {
     }
 
     return ""; // No solution
-  }
+}
 }

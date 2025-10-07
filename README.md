@@ -3,39 +3,41 @@
 **Major Course Output 1**  
 - **Release Date:** September 4, 2025  
 - **Due Date:** October 24, 2025 (Friday), 11:59 PM
-
+- **Report Link:**https://docs.google.com/document/d/1QTg3kbo4I3HCPSWFWCT8lufx9UoVxi7Aw_-MYUknfYM/edit?usp=sharing
 ---
 
 ## Status and Updates
 - 09/20/2025 Feat: Initialized Contributors and README
 - 09/24/2025 Feat: Testing Playing Sokoban
 - 09/26/2025 Feat: Tested Game Features and Timing, A* Search Implementation Trial, Brute Force Solution Trial
+- 09/30/2025 Feat: BFS Algorithm comments and implementation
 ---
 
 ## Algorithms to be deployed
-- A* Search (EJ)
-- Breadth First Search (REECE)
-- Best First Search (EJ)
-- Bidirectional Search (REECE)
-- Depth First Search (PHOEBE)
-- Uniform Cost Search (PHOEBE)
+- [ ] A* Search (ALL)
+- [ ] Greedy Best-First Search (ALL)
+- [x] Breadth First Search 
+- [ ] Best First Search (EJ)
+- [ ] Bidirectional Search (REECE)
+- [ ] Depth First Search (PHOEBE)
 ---
 
 # Project Timeline for SokoBot
 
 ## Week 1 (Sept 21–27) → Setup & Research
-- [ ] Install and configure Java JDK, clone the repo and ensure starter program compiles and runs (`freeplay` & `sokobot` modes).
-- [ ] Play a few Sokoban levels to fully understand rules and mechanics.
-- [ ] Research algorithms relevant to Sokoban:
+- [x] Install and configure Java JDK, clone the repo and ensure starter program compiles and runs (`freeplay` & `sokobot` modes).
+- [x] Play a few Sokoban levels to fully understand rules and mechanics.
+- [x] Research algorithms relevant to Sokoban:
   - BFS, DFS, Uniform Cost Search
   - A* with heuristics
   - Deadlock detection strategies (to avoid impossible states)
-- [ ] Assign roles within the group (algorithm research, coding, testing, documentation).
+- [x] Assign roles within the group (algorithm research, coding, testing, documentation).
 
 ## Week 2 (Sept 28–Oct 4) → Initial Implementation
-- [ ] Represent states clearly (`mapData`, `itemsData`).
-- [ ] Implement a simple solver (e.g., BFS or DFS) to confirm state representation works.
+- [x] Represent states clearly (`mapData`, `itemsData`).
+- [x] Implement a simple solver (e.g., BFS or DFS) to confirm state representation works.
 - [ ] Start documenting how the state and actions are represented for the report.
+- [ ] Research specific code implementation
 - [ ] Test on the simplest Sokoban levels.
 
 ## Week 3 (Oct 5–11) → Algorithm Refinement
