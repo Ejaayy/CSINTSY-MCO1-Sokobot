@@ -3,20 +3,19 @@ package solver;
 import java.awt.Point;
 import java.util.*;
 
-/*
-A* SEARCH LOGIC
 
-Key differences from BFS:
-1. Use PriorityQueue instead of Queue (ordered by f(n) = g(n) + h(n))
-2. Add g cost (actual path cost) and h heuristic (estimated cost to goal)
-3. f = g + h determines exploration order
-4. Lower f values explored first
-   */
+/*
+GREEDY BEST-FIRST SEARCH LOGIC
+*/
 
 public class SokoBot {
 
+
   public String solveSokobanPuzzle(int width, int height, char[][] mapData, char[][] itemsData) {
-// ---- Step 1: Collect target positions, player, and crates ----
+
+    System.out.println("eto yun man");
+
+    //Collect target positions, player, and crates
     Set<Point> targets = new HashSet<>();
     int startX = -1, startY = -1;
     Set<Point> crates = new HashSet<>();
@@ -35,66 +34,75 @@ public class SokoBot {
       }
     }
 
-    // ---- Step 2: Define State class with A* costs ----
+    //Define State class with GBFS heuristic
     class State {
       int playerX, playerY;
       Set<Point> crates;
       String path;
-      int g; // actual cost from start (path length)
-      int h; // heuristic cost to goal
-      int f; // total cost: f = g + h
+      int h; // heuristic cost to goal (the only metric used for ordering)
 
-      State(int px, int py, Set<Point> cs, String p, int gCost) {
+      State(int px, int py, Set<Point> cs, String p) {
         this.playerX = px;
         this.playerY = py;
         this.crates = new HashSet<>(cs);
         this.path = p;
-        this.g = gCost;
-        this.h = calculateHeuristic(cs, targets);
-        this.f = this.g + this.h;
+        this.h = calculateHeuristic(cs, targets, mapData);
       }
 
-      // Heuristic: sum of minimum Manhattan distances from each crate to nearest target
-      private int calculateHeuristic(Set<Point> crateSet, Set<Point> targetSet) {
+      // Manhattan distance heuristic
+      private int calculateHeuristic(Set<Point> crateSet, Set<Point> targetSet, char[][] mapData) {
         int totalDist = 0;
+
         for (Point crate : crateSet) {
           int minDist = Integer.MAX_VALUE;
+
           for (Point target : targetSet) {
+            // Manhattan distance formula
             int dist = Math.abs(crate.x - target.x) + Math.abs(crate.y - target.y);
-            minDist = Math.min(minDist, dist);
+
+            if (dist < minDist) {
+              minDist = dist;
+            }
           }
+
           totalDist += minDist;
         }
+
         return totalDist;
       }
 
-      @Override
-      public boolean equals(Object o) {
-        if (!(o instanceof State)) return false;
-        State s = (State) o;
-        return playerX == s.playerX && playerY == s.playerY && crates.equals(s.crates);
+      public String encodeState() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(playerX).append(',').append(playerY).append('|');
+
+        List<Point> sorted = new ArrayList<>(crates);
+        sorted.sort(Comparator.comparingInt((Point p) -> p.x).thenComparingInt(p -> p.y));
+
+        for (Point c : sorted)
+          sb.append(c.x).append(',').append(c.y).append(';');
+
+        return sb.toString();
       }
 
-      @Override
-      public int hashCode() {
-        return Objects.hash(playerX, playerY, crates);
+      public boolean isDeadlock(Point c) {
+        return mapData[c.y][c.x] != '.' &&
+                ((mapData[c.y-1][c.x] == '#' || mapData[c.y+1][c.x] == '#') &&
+                        (mapData[c.y][c.x-1] == '#' || mapData[c.y][c.x+1] == '#'));
       }
     }
 
-    // ---- Step 3: A* Initialization ----
-    State start = new State(startX, startY, crates, "", 0);
+    // GBFS Initialization
+    State start = new State(startX, startY, crates, "");
+    PriorityQueue<State> openSet = new PriorityQueue<>(Comparator.comparingInt(s -> s.h));
 
-    // PriorityQueue ordered by f cost (lowest first)
-    PriorityQueue<State> openSet = new PriorityQueue<>(Comparator.comparingInt(s -> s.f));
-    Set<State> visited = new HashSet<>();
-
+    Set<String> visited = new HashSet<>(); //Store visited States
     openSet.add(start);
 
     int[][] dirs = {{0, -1, 'u'}, {0, 1, 'd'}, {-1, 0, 'l'}, {1, 0, 'r'}};
 
-    // ---- Step 4: A* Loop ----
+    // GBFS Loop
     while (!openSet.isEmpty()) {
-      // Dequeue state with LOWEST f cost
+      // Dequeue state with LOWEST heuristic value
       State cur = openSet.poll();
 
       // Goal check
@@ -102,8 +110,10 @@ public class SokoBot {
         return cur.path;
       }
 
-      if (visited.contains(cur)) continue;
-      visited.add(cur);
+      //encode state
+      String encoded = cur.encodeState();
+      if (visited.contains(encoded)) continue;
+      visited.add(encoded);
 
       // Explore neighbors
       for (int[] d : dirs) {
@@ -123,14 +133,19 @@ public class SokoBot {
           if (mapData[pushY][pushX] == '#' || newCrates.contains(new Point(pushX, pushY)))
             continue;
 
+
           newCrates.remove(new Point(nx, ny));
-          newCrates.add(new Point(pushX, pushY));
+          Point pushed = new Point(pushX, pushY);
+          newCrates.add(pushed);
+
+          if (cur.isDeadlock(pushed)) continue;
         }
 
-        // Create new state with iancremented g cost
-        State next = new State(nx, ny, newCrates, cur.path + move, cur.g + 1);
+        // Create new state (no g cost tracking needed)
+        State next = new State(nx, ny, newCrates, cur.path + move);
+        String nextEncoded = next.encodeState();
 
-        if (!visited.contains(next)) {
+        if (!visited.contains(nextEncoded)) {
           openSet.add(next);
         }
       }
