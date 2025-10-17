@@ -6,13 +6,7 @@ import java.util.*;
 
 /*
 GREEDY BEST-FIRST SEARCH LOGIC
-
-Key differences from A*:
-1. Use PriorityQueue ordered ONLY by h(n) (heuristic)
-2. Ignore g cost (actual path cost) for ordering
-3. Always explores states that APPEAR closest to goal first
-4. Faster but not guaranteed to find optimal solution
-   */
+*/
 
 public class SokoBot {
 
@@ -45,7 +39,7 @@ public class SokoBot {
       int playerX, playerY;
       Set<Point> crates;
       String path;
-      int h; // heuristic cost to goal (ONLY metric used for ordering)
+      int h; // heuristic cost to goal (the only metric used for ordering)
 
       State(int px, int py, Set<Point> cs, String p) {
         this.playerX = px;
@@ -55,7 +49,7 @@ public class SokoBot {
         this.h = calculateHeuristic(cs, targets, mapData);
       }
 
-      // Manhattan-distance heuristic
+      // Manhattan distance heuristic
       private int calculateHeuristic(Set<Point> crateSet, Set<Point> targetSet, char[][] mapData) {
         int totalDist = 0;
 
