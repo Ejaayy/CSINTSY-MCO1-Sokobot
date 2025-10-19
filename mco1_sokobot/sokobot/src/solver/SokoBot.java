@@ -84,6 +84,7 @@ public class SokoBot {
         return sb.toString();
       }
 
+      //checks if a crate is in a position where its trapped
       public boolean isDeadlock(Point c) {
         return mapData[c.y][c.x] != '.' &&
                 ((mapData[c.y-1][c.x] == '#' || mapData[c.y+1][c.x] == '#') &&
@@ -112,45 +113,57 @@ public class SokoBot {
 
       //encode state
       String encoded = cur.encodeState();
-      if (visited.contains(encoded)) continue;
+      if (visited.contains(encoded)) continue; // skips checking visited states
       visited.add(encoded);
 
-      // Explore neighbors
+      // Explore all directions in that state
       for (int[] d : dirs) {
+
+        //compute next player position
         int nx = cur.playerX + d[0];
         int ny = cur.playerY + d[1];
         char move = (char) d[2];
 
+        //check if that tile is a wall
         if (mapData[ny][nx] == '#') continue;
 
+        //copy current state crates since we'll try moving them
         Set<Point> newCrates = new HashSet<>(cur.crates);
 
-        // Handle crate pushing
+        // check if that tile contains a crate
         if (newCrates.contains(new Point(nx, ny))) {
+
+          //compute where that crate will be pushed
           int pushX = nx + d[0];
           int pushY = ny + d[1];
 
+          //check if we cna push the crate there
           if (mapData[pushY][pushX] == '#' || newCrates.contains(new Point(pushX, pushY)))
             continue;
 
-
+          //update crate positions in newCrates
           newCrates.remove(new Point(nx, ny));
           Point pushed = new Point(pushX, pushY);
           newCrates.add(pushed);
 
+          //check for deadlocks after pushed
           if (cur.isDeadlock(pushed)) continue;
         }
 
-        // Create new state (no g cost tracking needed)
+        // Create new state on that directipn
         State next = new State(nx, ny, newCrates, cur.path + move);
-        String nextEncoded = next.encodeState();
 
+        //add this to open set if not visited to avoid visiting the same state
+        String nextEncoded = next.encodeState();
         if (!visited.contains(nextEncoded)) {
           openSet.add(next);
         }
+
+
       }
     }
 
     return ""; // No solution
   }
 }
+
