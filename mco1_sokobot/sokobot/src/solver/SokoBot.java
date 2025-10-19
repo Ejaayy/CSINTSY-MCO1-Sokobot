@@ -39,7 +39,7 @@ public class SokoBot {
       int playerX, playerY;
       Set<Point> crates;
       String path;
-      int h; // heuristic cost to goal (the only metric used for ordering)
+      int h; // heuristic cost to goal
 
       State(int px, int py, Set<Point> cs, String p) {
         this.playerX = px;
@@ -49,26 +49,38 @@ public class SokoBot {
         this.h = calculateHeuristic(cs, targets, mapData);
       }
 
-      // Manhattan distance heuristic
+      // Manhattan distance heuristic +
       private int calculateHeuristic(Set<Point> crateSet, Set<Point> targetSet, char[][] mapData) {
-        int totalDist = 0;
 
+        int heuristic = 0;
+
+        //list the targets' positions
+        List<Point> remainingTargets = new ArrayList<>(targetSet);
+
+        //find the nearest crate to that target
         for (Point crate : crateSet) {
-          int minDist = Integer.MAX_VALUE;
+          Point bestTarget = null;
+          int bestDist = Integer.MAX_VALUE;
 
-          for (Point target : targetSet) {
-            // Manhattan distance formula
+          // loop through all available targets to find the nearest one
+          for (Point target : remainingTargets) {
             int dist = Math.abs(crate.x - target.x) + Math.abs(crate.y - target.y);
 
-            if (dist < minDist) {
-              minDist = dist;
+            //keep the smallest distance found
+            if (dist < bestDist) {
+              bestDist = dist;
+              bestTarget = target;
             }
           }
 
-          totalDist += minDist;
+          // Once the closest target is found, add that distance to the total heuristic
+          if (bestTarget != null) {
+            heuristic += bestDist;
+            remainingTargets.remove(bestTarget); // mark this target as used
+          }
         }
+        return heuristic;
 
-        return totalDist;
       }
 
       public String encodeState() {
@@ -85,11 +97,32 @@ public class SokoBot {
       }
 
       //checks if a crate is in a position where its trapped
-      public boolean isDeadlock(Point c) {
-        return mapData[c.y][c.x] != '.' &&
-                ((mapData[c.y-1][c.x] == '#' || mapData[c.y+1][c.x] == '#') &&
-                        (mapData[c.y][c.x-1] == '#' || mapData[c.y][c.x+1] == '#'));
+      public boolean isDeadlock(Point c, Set<Point> newCrates) {
+        int x = c.x;
+        int y = c.y;
+
+        // Skip target positions
+        if (mapData[y][x] == '.') return false;
+
+        boolean up = mapData[y-1][x] == '#';
+        boolean down = mapData[y+1][x] == '#';
+        boolean left = mapData[y][x-1] == '#';
+        boolean right = mapData[y][x+1] == '#';
+
+        //Corner deadlock
+        if ((up && left) || (up && right) || (down && left) || (down && right)) {
+          return true;
+        }
+
+        // Crate stuck against a wall with another crate
+        if ((up && crates.contains(new Point(x, y-1))) ||
+                (down && crates.contains(new Point(x, y+1)))) {
+          return true;
+        }
+
+        return false;
       }
+
     }
 
     // GBFS Initialization
@@ -99,7 +132,8 @@ public class SokoBot {
     Set<String> visited = new HashSet<>(); //Store visited States
     openSet.add(start);
 
-    int[][] dirs = {{0, -1, 'u'}, {0, 1, 'd'}, {-1, 0, 'l'}, {1, 0, 'r'}};
+    int[][] dirs = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+    char[] moves = {'u', 'd', 'l', 'r'};
 
     // GBFS Loop
     while (!openSet.isEmpty()) {
@@ -117,12 +151,12 @@ public class SokoBot {
       visited.add(encoded);
 
       // Explore all directions in that state
-      for (int[] d : dirs) {
+      for (int i = 0; i < dirs.length; i++) {
 
         //compute next player position
-        int nx = cur.playerX + d[0];
-        int ny = cur.playerY + d[1];
-        char move = (char) d[2];
+        int nx = cur.playerX + dirs[i][0];
+        int ny = cur.playerY + dirs[i][1];
+        char move = moves[i];
 
         //check if that tile is a wall
         if (mapData[ny][nx] == '#') continue;
@@ -134,8 +168,8 @@ public class SokoBot {
         if (newCrates.contains(new Point(nx, ny))) {
 
           //compute where that crate will be pushed
-          int pushX = nx + d[0];
-          int pushY = ny + d[1];
+          int pushX = nx + dirs[i][0];
+          int pushY = ny + dirs[i][1];
 
           //check if we cna push the crate there
           if (mapData[pushY][pushX] == '#' || newCrates.contains(new Point(pushX, pushY)))
@@ -147,7 +181,7 @@ public class SokoBot {
           newCrates.add(pushed);
 
           //check for deadlocks after pushed
-          if (cur.isDeadlock(pushed)) continue;
+          if (cur.isDeadlock(pushed, newCrates)) continue;
         }
 
         // Create new state on that directipn
