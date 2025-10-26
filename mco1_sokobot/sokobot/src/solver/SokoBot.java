@@ -15,7 +15,7 @@ import java.util.*;
  * <p><b>Algorithm Overview:</b></p>
  * <ol>
  *   <li>Search Algorithmn: Greedy Best-First Search (GBFS)</li>
- *   <li>Heuristic: The sum of the minimum Manhattan distances of each crate to the nearest target.</li>
+ *   <li>Heuristic: The sum of the minimum Manhattan distances of each crate.</li>
  *   <li>State: player position + the set of crate positions.</li>
  *   <li>Deadlock Detection: Corner detection to eliminate unsolvable states.</li>
  * </ol>
@@ -147,43 +147,38 @@ public class SokoBot {
         this.playerY = py;
         this.crates = new HashSet<>(cs);
         this.path = p;
-        this.h = calculateHeuristic(cs, targets, mapData);
+        this.h = calculateHeuristic(cs, targets);
       }
 
       /**
-       * Computes the heuristic estimate for the configuration of crates given.
-       * This method provides a Manhattan distance heuristic that is admissible (never overestimates) but may not be optimal for Sokoban
-       * given the push properties and wall constraints, in which the heuristic simply sums the minimum Manhattan distance of each crate to their nearest target.Where: Manhattan Distance = |x1 - x2| + |y1 - y2|.
-       *
-       * Reason for this heuristic:
-       * Admissible - Never overestimates the actual cost.
-       * Fast computation: O(n*m) where n=crates, m=targets.
-       * Encourages search towards states where the crates are near targets.
+       * <p>Calculates the heuristic estimate for the crates configuration provided.
+       * The heuristic simply sums together the minimum Manhattan distance of each crate to its nearest target.
+       * Manhattan Distance is |x1 - x2| + |y1 - y2|.</p>
+       * It still gives a good directional estimate of progress and is computationally efficient.
        *
        * @param crateSet a set of crates to evaluate.
        * @param targetSet a set of target locations (goal locations for crates).
-       * @param mapData a 2D map array (passed for possible future use).
-       * @return total minimum distance from each crate to the nearest target.
+       * @return total minimum distance from each crate to the nearest targets
        */
-      private int calculateHeuristic(Set<Point> crateSet, Set<Point> targetSet, char[][] mapData) {
-        int totalDist = 0;
+      private int calculateHeuristic(Set<Point> crateSet, Set<Point> targetSet) {
 
+        int heuristic = 0;
+
+        // For each crate, find distance to nearest target
         for (Point crate : crateSet) {
           int minDist = Integer.MAX_VALUE;
 
           for (Point target : targetSet) {
-
             int dist = Math.abs(crate.x - target.x) + Math.abs(crate.y - target.y);
-
             if (dist < minDist) {
               minDist = dist;
             }
           }
 
-          totalDist += minDist;
+          heuristic += minDist;
         }
 
-        return totalDist;
+        return heuristic;
       }
 
       /**
@@ -215,9 +210,11 @@ public class SokoBot {
       /**
        * Determines if a crate at the specified position is in a deadlock (unsolvable) configuration.
        *
-       * <p>This method identifies straightforward corner deadlocks in which a crate has been pushed into a corner which is not a target location.
-       * As soon as the crate has been pushed into the corner, it would not be possible to get the crate out of the corner.
-       * Once a crate is in such a corner, the puzzle is deemed unsolvable in its current state.</p>
+       * <p>This method identifies deadlock states such as corner deadlock and crate stuck in a wall with another crate.
+       * Deadlock states conditions are met when:
+       * - The crate is stock between two walls either above/below and left/right, unable to move.
+       * - The crate is beside another crate and both are against a wall either above or below, unable to move.
+       * </p>
        *
        * <p><b>Deadlock Conditions:</b></p>
        * <ol>
@@ -236,16 +233,43 @@ public class SokoBot {
        * (OK)    (OK - on target)
        * </pre>
        *
+       * <p><b>Examples of Crate stock in a Wall with another Crate:</b></p>
+       * <pre>
+       * # #     # $     $ #     $ $
+       * $ $     # $     $ #     # #
+       * (BAD)   (BAD)   (BAD)   (BAD)
+       * </pre>
+       *
        * <p><b>Limitation:</b> This will only identify simple corner deadlocks. It will do nothing to identify
        * more complex deadlocks (freeze deadlocks, corral deadlocks).</p>
        *
        * @param c Point representing the crate position to check for deadlock
        * @return true if the crate is in a deadlock position, false otherwise
        */
-      public boolean isDeadlock(Point c) {
-        return mapData[c.y][c.x] != '.' &&
-                ((mapData[c.y-1][c.x] == '#' || mapData[c.y+1][c.x] == '#') &&
-                        (mapData[c.y][c.x-1] == '#' || mapData[c.y][c.x+1] == '#'));
+      public boolean isDeadlock(Point c, Set<Point> newCrates) {
+        int x = c.x;
+        int y = c.y;
+
+        // Skip target positions
+        if (mapData[y][x] == '.') return false;
+
+        boolean up = mapData[y-1][x] == '#';
+        boolean down = mapData[y+1][x] == '#';
+        boolean left = mapData[y][x-1] == '#';
+        boolean right = mapData[y][x+1] == '#';
+
+        //Corner deadlock
+        if ((up && left) || (up && right) || (down && left) || (down && right)) {
+          return true;
+        }
+
+        // Crate stuck against a wall with another crate
+        if ((up && crates.contains(new Point(x, y-1))) ||
+                (down && crates.contains(new Point(x, y+1)))) {
+          return true;
+        }
+
+        return false;
       }
     }
 
@@ -276,7 +300,8 @@ public class SokoBot {
      * Direction vectors for player movement in all four cardinal directions.
      * For more information Refer to the comments on the Sokobot class and solveSokobanPuzzle method.
      */
-    int[][] dirs = {{0, -1, 'u'}, {0, 1, 'd'}, {-1, 0, 'l'}, {1, 0, 'r'}};
+    int[][] dirs = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+    char[] moves = {'u', 'd', 'l', 'r'};
 
     /**
      * The primary GBFS loop continues until there are no more states to visit.
@@ -291,13 +316,6 @@ public class SokoBot {
       State cur = openSet.poll();
 
       /**
-       * Check if the current state is a goal state (all crates on targets).
-       */
-      if (cur.crates.equals(targets)) {
-        return cur.path;
-      }
-
-      /**
        * Mark the current state as visited.
        */
       String encoded = cur.encodeState();
@@ -305,13 +323,20 @@ public class SokoBot {
       visited.add(encoded);
 
       /**
+       * Check if the current state is a goal state (all crates on targets).
+       */
+      if (cur.crates.equals(targets)) {
+        return cur.path;
+      }
+
+      /**
        * Iterate through all four possible movement directions.
        * For each direction, attempt to generate a new valid state.
        */
-      for (int[] d : dirs) {
-        int nx = cur.playerX + d[0];
-        int ny = cur.playerY + d[1];
-        char move = (char) d[2];
+      for (int i = 0; i < dirs.length; i++){
+        int nx = cur.playerX + dirs[i][0];
+        int ny = cur.playerY + dirs[i][1];
+        char move = moves[i];
 
         /**
          * Check for wall collisions
@@ -322,18 +347,19 @@ public class SokoBot {
          * Clone the current crate positions for modification.
          */
         Set<Point> newCrates = new HashSet<>(cur.crates);
+        Point playerPos = new Point(nx, ny);
 
         /**
          * Check for crate collisions and handle pushing logic.
          */
-        if (newCrates.contains(new Point(nx, ny))) {
+        if (newCrates.contains(playerPos)) {
           /**
            * Identify the position to which the crate would be pushed.
            * The crate moves in the same direction of the player.
            * pushX and pushY represent the cell further than the crate.
            */
-          int pushX = nx + d[0];
-          int pushY = ny + d[1];
+          int pushX = nx + dirs[i][0];
+          int pushY = ny + dirs[i][1];
 
           /**
            * Determine whether the crate can be pushed.
@@ -353,10 +379,10 @@ public class SokoBot {
            * - Add the crate to its new position.
            * - Check for deadlock after the push.
            */
-          newCrates.remove(new Point(nx, ny));
+          newCrates.remove(playerPos);
           Point pushed = new Point(pushX, pushY);
           newCrates.add(pushed);
-          if (cur.isDeadlock(pushed)) continue;
+          if (cur.isDeadlock(pushed, newCrates)) continue;
         }
 
         /**

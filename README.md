@@ -6,71 +6,10 @@
 - **Report Link:**https://docs.google.com/document/d/1QTg3kbo4I3HCPSWFWCT8lufx9UoVxi7Aw_-MYUknfYM/edit?usp=sharing
 ---
 
-## Status and Updates
-- 09/20/2025 Feat: Initialized Contributors and README
-- 09/24/2025 Feat: Testing Playing Sokoban
-- 09/26/2025 Feat: Tested Game Features and Timing, A* Search Implementation Trial, Brute Force Solution Trial
-- 09/30/2025 Feat: BFS Algorithm comments and implementation
----
-
-## Algorithms to be deployed
-- [ ] A* Search (ALL)
-- [ ] Greedy Best-First Search (ALL)
-- [x] Breadth First Search 
-- [ ] Best First Search (EJ)
-- [ ] Bidirectional Search (REECE)
-- [ ] Depth First Search (PHOEBE)
----
-
-# Project Timeline for SokoBot
-
-## Week 1 (Sept 21–27) → Setup & Research
-- [x] Install and configure Java JDK, clone the repo and ensure starter program compiles and runs (`freeplay` & `sokobot` modes).
-- [x] Play a few Sokoban levels to fully understand rules and mechanics.
-- [x] Research algorithms relevant to Sokoban:
-  - BFS, DFS, Uniform Cost Search
-  - A* with heuristics
-  - Deadlock detection strategies (to avoid impossible states)
-- [x] Assign roles within the group (algorithm research, coding, testing, documentation).
-
-## Week 2 (Sept 28–Oct 4) → Initial Implementation
-- [x] Represent states clearly (`mapData`, `itemsData`).
-- [x] Implement a simple solver (e.g., BFS or DFS) to confirm state representation works.
-- [ ] Start documenting how the state and actions are represented for the report.
-- [ ] Research specific code implementation
-- [ ] Test on the simplest Sokoban levels.
-
-## Week 3 (Oct 5–11) → Algorithm Refinement
-- [ ] Add heuristics (A* or IDA*) to improve solving efficiency.
-- [ ] Experiment with pruning strategies (deadlock checks, redundant move elimination).
-- [ ] Ensure solutions finish within **15-second time limit**.
-- [ ] Keep logs of performance for different algorithms (feeds into “Evaluation and Performance” section of the report).
-
-## Week 4 (Oct 12–18) → Evaluation & Report Draft
-- [ ] Test solver on multiple levels (both provided & downloaded).
-- [ ] Record:
-  - % of puzzles solved
-  - Average time taken
-  - Average number of moves
-- [ ] Start writing the report:
-  - Algorithm implementation details
-  - Strengths & weaknesses (based on test results)
-  - Challenges encountered
-  - Contribution table
-
-## Week 5 (Oct 19–23) → Finalization
-- [ ] Polish the code: remove unused methods, ensure clarity and comments.
-- [ ] Finalize report (keep it within 4 pages, concise and original).
-- [ ] Package deliverables:
-  - 📂 ZIP file of source code (whole project directory)
-  - 📄 PDF report
-- [ ] Run a last check: can group members explain the work if asked?
-
----
-
-## 🚨 Deadline (Oct 24, 2025)
-- [ ] Submit the project before **11:59 PM**.
-- [ ] Double-check file names, completeness, and submission format.
+## Algorithms tested
+- [ ] A* Search 
+- [ ] Greedy Best-First Search 
+- [ ] Breadth First Search 
 
 ---
 
